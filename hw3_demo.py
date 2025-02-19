@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 # 1. Non-linearity of the X-Y relationships
@@ -59,9 +60,15 @@ def lin_reg2(df):
 def error_terms(df):
     df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-    ts = df.timestamp
-    for i in ts:
-        print(i)
+    df_sorted = df.sort_values(by="timestamp")
+
+    cat_vals = ["attack_type", "severity_level"]
+    num_vals = ["response_time_min", "flow_bytes_per_s", "flow_packets_per_s"]
+
+    df_dumb = pd.get_dummies(df, columns=cat_vals, drop_first=True)
+
+
+# Create plot with time data and residuals
 
 
 
