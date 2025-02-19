@@ -13,9 +13,8 @@ def lin_reg(df):
     model = sm.OLS(y, X).fit()
     y_pred = model.predict(X)
 
-    #residuals = model.resid
-    #print(residuals)
-
+    # residuals = model.resid
+    # print(residuals)
 
     # when the response time minutes increases, the amount of data compromised decreases
     # double check this regression
@@ -30,7 +29,8 @@ def lin_reg(df):
     ax.set_ylabel("Data Compromised", fontsize=15)
     ax.set_title("Response Time and Amount of Data Compromised", fontsize=20)
 
-    #print(model.summary())
+    # print(model.summary())
+
 
 # intercept: 257.8809 <-- expected amount of data compromised
 # slope: -0.0117 <--
@@ -41,20 +41,29 @@ def lin_reg(df):
 def lin_reg2(df):
     df_dumb = pd.get_dummies(df, columns=["attack_success"], drop_first=True, dtype=int)
 
-    #print(df_dumb.columns)
+    # print(df_dumb.columns)
 
     X = df_dumb["attack_success_Yes"]
     y = df_dumb["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
-    #y_pred = model.predict(X)
-    #print(y_pred)
+    # y_pred = model.predict(X)
+    # print(y_pred)
 
     print(model.summary())
 
 
-
 # 2. Correlation of error terms
+
+
+def error_terms(df):
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+    ts = df.timestamp
+    for i in ts:
+        print(i)
+
+
 
 
 # 3. Non-constant variance of error terms
@@ -71,11 +80,11 @@ def lin_reg2(df):
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    lin_reg(df)
-    #lin_reg2(df)
+    # lin_reg(df)
+    # lin_reg2(df)
+    error_terms(df)
     plt.show()
 
 
 if __name__ == '__main__':
     main()
-
