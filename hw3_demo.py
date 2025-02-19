@@ -13,8 +13,12 @@ def lin_reg(df):
     model = sm.OLS(y, X).fit()
     y_pred = model.predict(X)
 
-    residuals = model.resid  # Get the residuals
-    print("resid: " + residuals)
+    #residuals = model.resid
+    #print(residuals)
+
+
+    # when the response time minutes increases, the amount of data compromised decreases
+    # double check this regression
 
     fig, ax = plt.subplots()
 
@@ -26,7 +30,7 @@ def lin_reg(df):
     ax.set_ylabel("Data Compromised", fontsize=15)
     ax.set_title("Response Time and Amount of Data Compromised", fontsize=20)
 
-    print(model.summary())
+    #print(model.summary())
 
 # intercept: 257.8809 <-- expected amount of data compromised
 # slope: -0.0117 <--
@@ -34,30 +38,19 @@ def lin_reg(df):
 # 257.8809 + -0.0117*(mins)
 
 
-
-
 def lin_reg2(df):
-    df_dumb = pd.get_dummies(df, columns=["attack_success"], drop_first=True)
+    df_dumb = pd.get_dummies(df, columns=["attack_success"], drop_first=True, dtype=int)
 
-    print(df_dumb.attack_success_Yes)
+    #print(df_dumb.columns)
 
     X = df_dumb["attack_success_Yes"]
     y = df_dumb["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
-    y_pred = model.predict(X)
+    #y_pred = model.predict(X)
+    #print(y_pred)
 
-
-    fig, ax = plt.subplots()
-
-    ax.scatter(df_dumb["attack_success_Yes"], df_dumb["data_compromised"], color="darkorange", alpha=0.5)
-
-    ax.plot(df["attack_success_Yes"], y_pred)
-
-    ax.set_xlabel("attack_success_Yes", fontsize=15)
-    ax.set_ylabel("Data Compromised", fontsize=15)
-    ax.set_title("attack_success_Yes and Amount of Data Compromised", fontsize=20)
-
+    print(model.summary())
 
 
 
@@ -80,7 +73,6 @@ def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
     lin_reg(df)
     #lin_reg2(df)
-
     plt.show()
 
 
