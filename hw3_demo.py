@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 import numpy as np
-from statsmodels.compat import lzip
+from sklearn.metrics import r2_score
 import statsmodels.stats.api as sms
 
 
@@ -161,6 +161,31 @@ def high_lev(df):
 
 # 6. Collinearity
 
+def co_lin(df):
+    success_bin = []
+
+    for i in df["attack_success"]:
+        if i.lower() == "yes":
+            success_bin.append(1)
+        else:
+            success_bin.append(0)
+
+    df["attack_success"] = success_bin
+
+    X = df[["flow_bytes_per_s", "flow_packets_per_s"]]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
+    y_pred = model.predict(X)
+
+    r_squared = r2_score(y, y_pred)
+    vif = 1 / (1 - r_squared)
+
+    print("vif:", vif)
+
+
+
+
 
 
 
@@ -177,7 +202,8 @@ def main():
     # error_terms(df)
     # var_error_terms(df)
 
-    high_lev(df)
+    #high_lev(df)
+    co_lin(df)
     plt.show()
 
 
