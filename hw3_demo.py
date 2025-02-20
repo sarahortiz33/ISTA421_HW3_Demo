@@ -59,13 +59,24 @@ def lin_reg2(df):
 
 def error_terms(df):
     df["timestamp"] = pd.to_datetime(df["timestamp"])
-
     df_sorted = df.sort_values(by="timestamp")
 
     cat_vals = ["attack_type", "severity_level"]
     num_vals = ["response_time_min", "flow_bytes_per_s", "flow_packets_per_s"]
 
-    df_dumb = pd.get_dummies(df, columns=cat_vals, drop_first=True)
+    df_dumb = pd.get_dummies(df, columns=cat_vals, drop_first=True, dtype=int)
+
+    new_cat = ["attack_type_Malware", "attack_type_Man-in-the-Middle",
+               "attack_type_Phishing", "attack_type_Ransomware",
+               "attack_type_SQL Injection", "severity_level_High",
+               "severity_level_Low", "severity_level_Medium"]
+
+    X_num = df_dumb[num_vals]
+    X_cat = df_dumb[new_cat]
+    X = pd.concat([X_num, X_cat])
+
+
+    
 
 
 # Create plot with time data and residuals
