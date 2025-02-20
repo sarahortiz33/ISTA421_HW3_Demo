@@ -94,18 +94,14 @@ def error_terms(df):
 
 
 def var_error_terms(df):
-    cat_vals = ["attack_type", "severity_level"]
-    num_vals = ["response_time_min", "flow_bytes_per_s", "flow_packets_per_s"]
+    num_vals = ["flow_bytes_per_s", "flow_packets_per_s"]
+    X = sm.add_constant(df[num_vals])
 
-    X_num = df_dumb[num_vals]
-    X_cat = df_dumb[new_cat]
-    X = pd.concat([X_num, X_cat], axis=1)
-    X = sm.add_constant(X)
-    y = df_dumb["data_compromised"]
+    y = df["response_time_min"]
     model = sm.OLS(y, X).fit()
 
     residuals = model.resid
-    plt.plot(df_dumb["timestamp"], residuals, marker='o', alpha=0.5, color='blue')
+    plt.plot(df["timestamp"], residuals, marker='o', alpha=0.5, color='blue')
     plt.xlabel("Time", fontsize=15)
     plt.ylabel("Residuals", fontsize=15)
     plt.title("Residuals Against Time", fontsize=20)
