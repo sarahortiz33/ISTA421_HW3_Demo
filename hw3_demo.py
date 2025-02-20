@@ -64,7 +64,7 @@ def error_terms(df):
     cat_vals = ["attack_type", "severity_level"]
     num_vals = ["response_time_min", "flow_bytes_per_s", "flow_packets_per_s"]
 
-    df_dumb = pd.get_dummies(df, columns=cat_vals, drop_first=True, dtype=int)
+    df_dumb = pd.get_dummies(df_sorted, columns=cat_vals, drop_first=True, dtype=int)
 
     new_cat = ["attack_type_Malware", "attack_type_Man-in-the-Middle",
                "attack_type_Phishing", "attack_type_Ransomware",
@@ -74,12 +74,15 @@ def error_terms(df):
     X_num = df_dumb[num_vals]
     X_cat = df_dumb[new_cat]
     X = pd.concat([X_num, X_cat])
+    X = sm.add_constant(X)
+    y = df_dumb["data_compromised"]
+    model = sm.OLS(y, X).fit()
 
-
-    
-
-
-# Create plot with time data and residuals
+    residuals = model.resid
+    plt.plot(df_dumb["timestamp"], residuals)
+    plt.axhline(y=0, color='red', linestyle='--')
+    plt.xlabel("Time")
+    plt.ylabel("Residuals")
 
 
 
