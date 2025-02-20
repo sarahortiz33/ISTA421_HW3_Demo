@@ -85,8 +85,8 @@ def error_terms(df):
     model = sm.OLS(y, X).fit()
 
     residuals = model.resid
-    plt.plot(df_dumb["timestamp"], residuals, marker='o', alpha=0.5, color='blue')
-    plt.axhline(y=0, color='red', linestyle='--')
+    plt.plot(df_dumb["timestamp"], residuals, marker="o", alpha=0.5, color="blue")
+    plt.axhline(y=0, color="red", linestyle="--")
     plt.xlabel("Time", fontsize=15)
     plt.ylabel("Residuals", fontsize=15)
     plt.title("Residuals Against Time", fontsize=20)
@@ -121,8 +121,6 @@ def var_error_terms(df):
 
 
 
-
-
 # 5. High-leverage points
 
 
@@ -142,14 +140,34 @@ def high_lev(df):
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
 
-    
+    influence = model.get_influence()
+    leverage = influence.hat_matrix_diag
+    n = model.nobs
+    p = X.shape[1]
 
+    max_val = (2 * p) / n
 
+    print("High Leverage Points: ")
+    for i in leverage:
+        if i > max_val:
+            print(str(i))
 
-
+    plt.scatter(range(len(leverage)), leverage, color="darkorange", alpha=0.7)
+    plt.axhline(y=max_val, color="blue", linestyle="--")
+    plt.xlabel("Number of Observations", fontsize=15)
+    plt.ylabel("Leverage Value", fontsize=15)
+    plt.title("High Leverage Check", fontsize=20)
 
 
 # 6. Collinearity
+
+
+
+
+
+
+
+
 
 
 def main():
