@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from statsmodels.compat import lzip
+import statsmodels.stats.api as sms
 
 
 # 1. Non-linearity of the X-Y relationships
+
 
 def lin_reg(df):
     X = df["response_time_min"]
@@ -99,14 +101,17 @@ def var_error_terms(df):
 
     y = df["response_time_min"]
     model = sm.OLS(y, X).fit()
-
     residuals = model.resid
-    plt.plot(df["timestamp"], residuals, marker='o', alpha=0.5, color='blue')
-    plt.xlabel("Time", fontsize=15)
-    plt.ylabel("Residuals", fontsize=15)
-    plt.title("Residuals Against Time", fontsize=20)
 
+    # Code below sourced from GeeksforGeeks
+    # https://www.geeksforgeeks.org/how-to-perform-a-breusch-pagan-test-in-python/
+    names = ['Lagrange multiplier statistic', 'p-value',
+             'f-value', 'f p-value']
 
+    test_result = sms.het_breuschpagan(residuals, model.model.exog)
+
+    for i in range(len(names)):
+        print(names[i] + ": " + str(test_result[i]))
 
 
 # 4. Outliers
