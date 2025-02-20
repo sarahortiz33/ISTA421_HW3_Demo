@@ -117,7 +117,36 @@ def var_error_terms(df):
 # 4. Outliers
 
 
+
+
+
+
+
+
 # 5. High-leverage points
+
+
+def high_lev(df):
+    success_bin = []
+
+    for i in df["attack_success"]:
+        if i.lower() == "yes":
+            success_bin.append(1)
+        else:
+            success_bin.append(0)
+
+    df["attack_success"] = success_bin
+
+    X = df[["flow_bytes_per_s", "flow_packets_per_s"]]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
+
+    
+
+
+
+
 
 
 # 6. Collinearity
@@ -128,7 +157,9 @@ def main():
     # lin_reg(df)
     # lin_reg2(df)
     # error_terms(df)
-    var_error_terms(df)
+    # var_error_terms(df)
+
+    high_lev(df)
     plt.show()
 
 
