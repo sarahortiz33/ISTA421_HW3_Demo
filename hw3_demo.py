@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 import numpy as np
-from sklearn.metrics import r2_score
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.stats.api as sms
 
 
@@ -22,6 +22,8 @@ def lin_reg(df):
     # when the response time minutes increases, the amount of data compromised decreases
     # double check this regression
 
+    print(df[["response_time_min", "data_compromised"]].corr())
+
     fig, ax = plt.subplots()
 
     ax.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
@@ -32,7 +34,7 @@ def lin_reg(df):
     ax.set_ylabel("Data Compromised", fontsize=15)
     ax.set_title("Response Time and Amount of Data Compromised", fontsize=20)
 
-    # print(model.summary())
+    print(model.summary())
 
 
 # intercept: 257.8809 <-- expected amount of data compromised
@@ -85,6 +87,7 @@ def error_terms(df):
     model = sm.OLS(y, X).fit()
 
     residuals = model.resid
+    plt.figure()
     plt.plot(df_dumb["timestamp"], residuals, marker="o", alpha=0.5, color="blue")
     plt.axhline(y=0, color="red", linestyle="--")
     plt.xlabel("Time", fontsize=15)
@@ -124,7 +127,7 @@ def var_error_terms(df):
 # 5. High-leverage points
 
 
-def high_lev(df):
+def high_lev_cat(df):
     success_bin = []
 
     for i in df["attack_success"]:
@@ -135,6 +138,32 @@ def high_lev(df):
 
     df["attack_success"] = success_bin
 
+    X = df[["flow_bytes_per_s", "flow_packets_per_s", "attack_success"]]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
+
+    influence = model.get_influence()
+    leverage = influence.hat_matrix_diag
+    n = model.nobs
+    p = X.shape[1]
+
+    max_val = (2 * p) / n
+
+    print("High Leverage Points: ")
+    for i in leverage:
+        if i > max_val:
+            print(str(i))
+
+    plt.figure()
+    plt.scatter(range(len(leverage)), leverage, color="darkorange", alpha=0.7)
+    plt.axhline(y=max_val, color="blue", linestyle="--")
+    plt.xlabel("Number of Observations", fontsize=15)
+    plt.ylabel("Leverage Value", fontsize=15)
+    plt.title("High Leverage Check (with categorical variable)", fontsize=20)
+
+
+def high_lev_no_cat(df):
     X = df[["flow_bytes_per_s", "flow_packets_per_s"]]
     y = df["data_compromised"]
     X = sm.add_constant(X)
@@ -152,11 +181,12 @@ def high_lev(df):
         if i > max_val:
             print(str(i))
 
+    plt.figure()
     plt.scatter(range(len(leverage)), leverage, color="darkorange", alpha=0.7)
     plt.axhline(y=max_val, color="blue", linestyle="--")
     plt.xlabel("Number of Observations", fontsize=15)
     plt.ylabel("Leverage Value", fontsize=15)
-    plt.title("High Leverage Check", fontsize=20)
+    plt.title("High Leverage Check (without categorical variable)", fontsize=20)
 
 
 # 6. Collinearity
@@ -172,38 +202,32 @@ def co_lin(df):
 
     df["attack_success"] = success_bin
 
-    X = df[["flow_bytes_per_s", "flow_packets_per_s"]]
+    X = df[["flow_bytes_per_s", "flow_packets_per_s", "attack_success"]]
     y = df["data_compromised"]
     X = sm.add_constant(X)
-    model = sm.OLS(y, X).fit()
-    y_pred = model.predict(X)
 
-    r_squared = r2_score(y, y_pred)
-    vif = 1 / (1 - r_squared)
+    vif_df = pd.DataFrame()
+    vif_df["Feature"] = X.columns
+    vif_vals = []
 
-    print("vif:", vif)
+    for i in range(X.shape[1]):
+        vif = variance_inflation_factor(X.values, i)
+        vif_vals.append(vif)
 
+    vif_df["VIF"] = vif_vals
 
-
-
-
-
-
-
-
-
-
+    print(vif_df)
 
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    # lin_reg(df)
-    # lin_reg2(df)
-    # error_terms(df)
-    # var_error_terms(df)
-
-    #high_lev(df)
-    co_lin(df)
+    #lin_reg(df)
+    #lin_reg2(df)
+    #error_terms(df)
+    #var_error_terms(df)
+    #high_lev_cat(df)
+    #high_lev_no_cat(df)
+    #co_lin(df)
     plt.show()
 
 
