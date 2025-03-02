@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
-import numpy as np
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.stats.outliers_influence import OLSInfluence
 import statsmodels.stats.api as sms
 
 
@@ -15,12 +15,6 @@ def lin_reg(df):
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
     y_pred = model.predict(X)
-
-    # residuals = model.resid
-    # print(residuals)
-
-    # when the response time minutes increases, the amount of data compromised decreases
-    # double check this regression
 
     print(df[["response_time_min", "data_compromised"]].corr())
 
@@ -37,23 +31,13 @@ def lin_reg(df):
     print(model.summary())
 
 
-# intercept: 257.8809 <-- expected amount of data compromised
-# slope: -0.0117 <--
-
-# 257.8809 + -0.0117*(mins)
-
-
 def lin_reg2(df):
     df_dumb = pd.get_dummies(df, columns=["attack_success"], drop_first=True, dtype=int)
-
-    # print(df_dumb.columns)
 
     X = df_dumb["attack_success_Yes"]
     y = df_dumb["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
-    # y_pred = model.predict(X)
-    # print(y_pred)
 
     print(model.summary())
 
@@ -120,8 +104,21 @@ def var_error_terms(df):
 # 4. Outliers
 
 
+def outliers(df):
+    X = df["response_time_min"]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
 
+    influence = OLSInfluence(model)
+    studen_resid = influence.resid_studentized_internal
 
+    plt.figure()
+    plt.scatter(model.fittedvalues, studen_resid, alpha=0.5, color="darkorange")
+    plt.axhline(y=0, color="blue", linestyle="--")
+    plt.xlabel("Fitted Values")
+    plt.ylabel("Studentized Residuals")
+    plt.title("Studentized Residual Plot")
 
 
 # 5. High-leverage points
@@ -221,13 +218,14 @@ def co_lin(df):
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    #lin_reg(df)
-    #lin_reg2(df)
-    #error_terms(df)
-    #var_error_terms(df)
-    #high_lev_cat(df)
-    #high_lev_no_cat(df)
-    #co_lin(df)
+    # lin_reg(df)
+    # lin_reg2(df)
+    # error_terms(df)
+    # var_error_terms(df)
+    # outliers(df)
+    # high_lev_cat(df)
+    # high_lev_no_cat(df)
+    # co_lin(df)
     plt.show()
 
 
