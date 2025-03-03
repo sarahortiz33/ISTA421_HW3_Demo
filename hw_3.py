@@ -7,8 +7,7 @@ import statsmodels.stats.api as sms
 
 
 # Equations for linear model
-# - Qualitative
-# - Quantitative
+
 
 def quant_lin_reg(df):
     X = df["response_time_min"]
@@ -30,24 +29,31 @@ def quant_lin_reg(df):
 
 def qual_lin_reg(df):
     pred = ["attack_success", "attack_type"]
+    df_dumb = pd.get_dummies(df, columns=pred, drop_first=True, dtype=int)
+    df_dumb.rename(columns={
+        "attack_type_SQL Injection": "attack_type_SQL_Injection",
+        "attack_type_Man-in-the-Middle": "attack_type_Man_in_the_Middle"
+    }, inplace=True)
 
-    df_dumb = pd.get_dummies(df[pred], drop_first=True)
-    print(df_dumb.columns)
+    new_cat = ["attack_success_Yes", "attack_type_Malware", "attack_type_Man_in_the_Middle",
+               "attack_type_Phishing", "attack_type_Ransomware",
+               "attack_type_SQL_Injection"]
 
-    y = df_dumb["data_compromised"]
+    X = df_dumb[new_cat]
+    y = df["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
 
-    y_pred = model.predict(X)
-
-    plt.figure()
-    plt.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
-    plt.plot(df["response_time_min"], y_pred)
-    plt.xlabel("Response Time (min)", fontsize=15)
-    plt.ylabel("Data Compromised", fontsize=15)
-    plt.title("Response Time and Amount of Data Compromised", fontsize=20)
-
     print(model.summary())
+
+
+# How to extend your linear model
+
+
+
+
+
+
 
 
 def main():
@@ -58,11 +64,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-# How to extend your linear model
-
 
 
 
