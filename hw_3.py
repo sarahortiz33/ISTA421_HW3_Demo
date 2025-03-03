@@ -17,14 +17,10 @@ def quant_lin_reg(df):
     model = sm.OLS(y, X).fit()
     y_pred = model.predict(X)
 
-    print(df[["response_time_min", "data_compromised"]].corr())
-
     fig, ax = plt.subplots()
 
     ax.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
-
     ax.plot(df["response_time_min"], y_pred)
-
     ax.set_xlabel("Response Time (min)", fontsize=15)
     ax.set_ylabel("Data Compromised", fontsize=15)
     ax.set_title("Response Time and Amount of Data Compromised", fontsize=20)
@@ -40,11 +36,26 @@ def qual_lin_reg(df):
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
 
+    y_pred = model.predict(X)
+
+    plt.figure()
+    plt.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
+    plt.plot(df["response_time_min"], y_pred)
+    plt.xlabel("Response Time (min)", fontsize=15)
+    plt.ylabel("Data Compromised", fontsize=15)
+    plt.title("Response Time and Amount of Data Compromised", fontsize=20)
+
     print(model.summary())
 
 
+def main():
+    df = pd.read_csv("cybersecurity_incidents.csv")
+    qual_lin_reg(df)
+    plt.show()
 
 
+if __name__ == '__main__':
+    main()
 
 
 
