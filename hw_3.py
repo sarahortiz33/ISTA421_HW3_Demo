@@ -13,15 +13,6 @@ def response_dcomp(df):
     y = df["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
-    y_pred = model.predict(X)
-
-    plt.figure()
-    plt.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
-    plt.plot(df["response_time_min"], y_pred)
-    plt.xlabel("Response Time (min)", fontsize=15)
-    plt.ylabel("Data Compromised", fontsize=15)
-    plt.title("Response Time and Amount of Data Compromised", fontsize=20)
-
     print(model.summary())
 
 
@@ -33,7 +24,7 @@ def byte_packet_response(df):
     print(model.summary())
 
 
-def qual_lin_reg(df):
+def attacks_dcomp(df):
     pred = ["attack_success", "attack_type"]
     df_dumb = pd.get_dummies(df, columns=pred, drop_first=True, dtype=int)
     df_dumb.rename(columns={
@@ -53,10 +44,30 @@ def qual_lin_reg(df):
     print(model.summary())
 
 
+def packets_level(df):
+    pred = ["severity_level"]
+    df_dumb = pd.get_dummies(df, columns=pred, drop_first=True, dtype=int)
+
+    print(df_dumb.columns)
+
+
+    new_cat = ["severity_level_Low", "severity_level_Medium",
+               "severity_level_High"]
+
+    X = df_dumb[new_cat]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
+
+    print(model.summary())
+
+
+
+
 # Extending the linear models
 
 
-def quant_ext(df):
+def byte_packet_ext(df):
     y = df["data_compromised"]
     df["response_time_min_squared"] = df["response_time_min"] ** 2
     X = df[["response_time_min", "response_time_min_squared"]]
@@ -66,7 +77,7 @@ def quant_ext(df):
     print(model.summary())
 
 
-def qual_ext(df):
+def attack_dcomp_ext(df):
     pred = ["attack_success", "attack_type"]
     df_dumb = pd.get_dummies(df, columns=pred, drop_first=True, dtype=int)
     df_dumb.rename(columns={
@@ -74,11 +85,22 @@ def qual_ext(df):
         "attack_type_Man-in-the-Middle": "attack_type_Man_in_the_Middle"
     }, inplace=True)
 
+    df_dumb["s_malware"] = df_dumb["attack_success_Yes"] * df_dumb["attack_type_Malware"]
+    df_dumb["s_ransom"] = df_dumb["attack_success_Yes"] * df_dumb["attack_type_Ransomware"]
+    df_dumb["s_phish"] = df_dumb["attack_success_Yes"] * df_dumb["attack_type_Phishing"]
+    df_dumb["s_sql"] = df_dumb["attack_success_Yes"] * df_dumb["attack_type_SQL_Injection"]
+    df_dumb["s_middle"] = df_dumb["attack_success_Yes"] * df_dumb["attack_type_Man_in_the_Middle"]
+
     new_cat = ["attack_success_Yes", "attack_type_Malware", "attack_type_Man_in_the_Middle",
                "attack_type_Phishing", "attack_type_Ransomware",
-               "attack_type_SQL_Injection"]
+               "attack_type_SQL_Injection", "s_malware", "s_ransom", "s_phish",
+               "s_sql", "s_middle"]
 
-
+    X = df_dumb[new_cat]
+    y = df["data_compromised"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
+    print(model.summary())
 
 
 
@@ -87,10 +109,15 @@ def main():
     #response_dcomp(df)
     #byte_packet_response(df)
 
-    #qual_lin_reg(df)
 
-    quant_ext(df)
-    #qual_ext(df)
+    #attacks_dcomp(df)
+    packets_level(df)
+
+
+    #byte_packet_ext(df)
+
+
+    #attack_dcomp_ext(df)
     plt.show()
 
 
@@ -130,15 +157,15 @@ value was low, at 0.001, and both the F-statistics and p-values were high, and
 not indicate any statistical significance. 
 
 
-Q4. 
+Q4. Does the extension of the linear models reveal any key insights?
+
+A4: 
+
+
+Q5: How accurately can the amount of compromised data be predicted?
+
+A5: 
 
 
 """
-
-
-# - Concept, coding, question sections
-
-
-
-
 
