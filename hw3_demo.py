@@ -16,14 +16,10 @@ def lin_reg(df):
     model = sm.OLS(y, X).fit()
     y_pred = model.predict(X)
 
-    print(df[["response_time_min", "data_compromised"]].corr())
-
     fig, ax = plt.subplots()
 
     ax.scatter(df["response_time_min"], df["data_compromised"], color="darkorange", alpha=0.5)
-
     ax.plot(df["response_time_min"], y_pred)
-
     ax.set_xlabel("Response Time (min)", fontsize=15)
     ax.set_ylabel("Data Compromised", fontsize=15)
     ax.set_title("Response Time and Amount of Data Compromised", fontsize=20)
@@ -116,9 +112,9 @@ def outliers(df):
     plt.figure()
     plt.scatter(model.fittedvalues, studen_resid, alpha=0.5, color="darkorange")
     plt.axhline(y=0, color="blue", linestyle="--")
-    plt.xlabel("Fitted Values")
-    plt.ylabel("Studentized Residuals")
-    plt.title("Studentized Residual Plot")
+    plt.xlabel("Fitted Values", fontsize="15")
+    plt.ylabel("Studentized Residuals", fontsize="15")
+    plt.title("Studentized Residual Plot", fontsize="20")
 
 
 # 5. High-leverage points
