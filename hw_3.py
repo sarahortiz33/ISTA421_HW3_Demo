@@ -47,10 +47,16 @@ def qual_lin_reg(df):
     print(model.summary())
 
 
-# How to extend your linear model
+# Extending the linear models
 
 
-
+def quant_ext(df):
+    X = df["response_time_min"]
+    y = df["data_compromised"]
+    X_squared = X ** 2
+    X = sm.add_constant(X_squared)
+    model = sm.OLS(y, X).fit()
+    print(model.summary())
 
 
 
@@ -58,7 +64,9 @@ def qual_lin_reg(df):
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    qual_lin_reg(df)
+    quant_lin_reg(df)
+    #qual_lin_reg(df)
+    quant_ext(df)
     plt.show()
 
 
