@@ -29,9 +29,11 @@ def quant_lin_reg(df):
 
 
 def qual_lin_reg(df):
-    df_dumb = pd.get_dummies(df, columns=["attack_success"], drop_first=True, dtype=int)
+    pred = ["attack_success", "attack_type"]
 
-    X = df_dumb["attack_success_Yes"]
+    df_dumb = pd.get_dummies(df[pred], drop_first=True)
+    print(df_dumb.columns)
+
     y = df_dumb["data_compromised"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
