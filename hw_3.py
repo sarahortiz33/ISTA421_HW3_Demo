@@ -1,8 +1,5 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
-import numpy as np
-import statsmodels.stats.api as sms
 
 
 # Equations for linear models
@@ -48,20 +45,15 @@ def packets_level(df):
     pred = ["severity_level"]
     df_dumb = pd.get_dummies(df, columns=pred, drop_first=True, dtype=int)
 
-    print(df_dumb.columns)
-
-
     new_cat = ["severity_level_Low", "severity_level_Medium",
                "severity_level_High"]
 
     X = df_dumb[new_cat]
-    y = df["data_compromised"]
+    y = df["flow_packets_per_s"]
     X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
 
     print(model.summary())
-
-
 
 
 # Extending the linear models
@@ -106,19 +98,12 @@ def attack_dcomp_ext(df):
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    #response_dcomp(df)
-    #byte_packet_response(df)
-
-
-    #attacks_dcomp(df)
+    response_dcomp(df)
+    byte_packet_response(df)
+    attacks_dcomp(df)
     packets_level(df)
-
-
-    #byte_packet_ext(df)
-
-
-    #attack_dcomp_ext(df)
-    plt.show()
+    byte_packet_ext(df)
+    attack_dcomp_ext(df)
 
 
 if __name__ == '__main__':
@@ -159,12 +144,32 @@ not indicate any statistical significance.
 
 Q4. Does the extension of the linear models reveal any key insights?
 
-A4: 
+A4: The extension of the flow bytes and packets per second slightly fits the
+data better than the linear regression model. Instead of the R-squared value
+being 0.001, it increases to 0.002. While not a large improvement, it could
+suggest that a more flexible model may be more useful. In the extension with
+the qualitative model with attack success and type as the predictors and data
+compromised as the response, the R-squared is also low, at 0.011, and is only
+a slight improvement from the linear model. Because of this, it does not seem
+to reveal anything new about the data.
 
 
 Q5: How accurately can the amount of compromised data be predicted?
 
-A5: 
+A5: Based on the linear models, none of the variables had significantly strong
+relationships that would have been able to accurately predict the amount of
+compromised data. Using another type of model might be beneficial since this
+was the case.
+
+
+Q6: Is there a relationship between high severity levels and amount of flow
+packets per second?
+
+A6: There seems to be an association with low severity levels and the number of
+flow packets per second as its p-value is 0.050. When the severity level is low,
+the predicted value of flow packets decreases by about 519 packets per second.
+Because the rest of results from the model is not statistically significant, it
+is not the strongest relationship, but it is important to note this association.
 
 
 """
