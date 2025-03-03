@@ -51,10 +51,11 @@ def qual_lin_reg(df):
 
 
 def quant_ext(df):
-    X = df["response_time_min"]
     y = df["data_compromised"]
-    X_squared = X ** 2
-    X = sm.add_constant(X_squared)
+    df["response_time_min_squared"] = df["response_time_min"] ** 2
+    X = df[["response_time_min", "response_time_min_squared"]]
+
+    X = sm.add_constant(X)
     model = sm.OLS(y, X).fit()
     print(model.summary())
 
