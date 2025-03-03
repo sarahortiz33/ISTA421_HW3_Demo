@@ -2,15 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 import numpy as np
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-from statsmodels.stats.outliers_influence import OLSInfluence
 import statsmodels.stats.api as sms
 
 
-# Equations for linear model
+# Equations for linear models
 
 
-def quant_lin_reg(df):
+def response_dcomp(df):
     X = df["response_time_min"]
     y = df["data_compromised"]
     X = sm.add_constant(X)
@@ -24,6 +22,14 @@ def quant_lin_reg(df):
     plt.ylabel("Data Compromised", fontsize=15)
     plt.title("Response Time and Amount of Data Compromised", fontsize=20)
 
+    print(model.summary())
+
+
+def byte_packet_response(df):
+    X = df[["flow_bytes_per_s", "flow_packets_per_s"]]
+    y = df["response_time_min"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X).fit()
     print(model.summary())
 
 
@@ -78,7 +84,9 @@ def qual_ext(df):
 
 def main():
     df = pd.read_csv("cybersecurity_incidents.csv")
-    #quant_lin_reg(df)
+    #response_dcomp(df)
+    #byte_packet_response(df)
+
     #qual_lin_reg(df)
 
     quant_ext(df)
@@ -113,7 +121,16 @@ lowest of all the others. While not statistically significant, it suggests that
 it has the largest effect on data compromised out of all the other attack types.
 
 
-Q3. 
+Q3. Is response time affected by any other numerical variables in the dataset?
+
+A3: When response time was checked alongside the flow bytes per second and flow
+packets per second, the model did not indicate that there was a strong
+correlation between the two predictors and the response variable. The R-squared
+value was low, at 0.001, and both the F-statistics and p-values were high, and
+not indicate any statistical significance. 
+
+
+Q4. 
 
 
 """
